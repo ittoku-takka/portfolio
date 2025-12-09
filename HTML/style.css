@@ -1,0 +1,23 @@
+.test1{
+    color: red;
+}
+
+#test2 {
+    color: blue;
+}
+
+p {
+    font-size: 30px;
+}
+
+#rightmessage {
+    text-align: right;
+}
+
+#centermessage {
+    text-align: center;
+}
+
+#leftmessage {
+    text-align: left;
+}

@@ -1,0 +1,57 @@
+/*.red{
+    color: #FF0000;
+}
+.blue{
+    color: #0000FF;
+}
+
+p{
+    width: 200px;
+}
+    .normal{
+    font-weight: normal;
+}
+
+.work1{
+    line-height: 200%;
+    letter-spacing:-0.2em;
+}
+.work2{
+    line-height: 10em;
+    letter-spacing:2em;
+}*/
+/*div{
+    width: 150px;
+    height: 150px;
+}
+p{
+    width: 80px;
+    border: dashed black;
+    height: 200vh;
+}*/
+
+.box1{
+    width: 150px;
+    height: 150px;
+    background: red ;
+    float: left;
+}
+.box2{
+    width: 150px;
+    height: 150px;
+    background: yellow ;
+    float: left;
+}
+.box3{
+    width: 500px;
+    height: 500px;
+    background: gray ;
+    clear: left;
+}
+
+
+
+
+
+
+

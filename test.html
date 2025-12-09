@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BABYLON::プロジェクト・ボード (PRO)</title>
+    <style>
+        /*
+         * --- CSS スタイル定義 ---
+         */
+
+        :root {
+            --color-window-bg: #fffbf0; 
+            --color-window-border: #000;
+            --color-text: #000;
+            --color-link: #004d40; /* エメラルドグリーン系（プロフェッショナルな強調色） */
+            --font-family-rpg: 'DotGothic16', monospace;
+        }
+
+        /* DotGothic16フォントをGoogle Fontsからインポート */
+        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-rpg);
+            background: linear-gradient(135deg, #1f4037 0%, #99f2c8 100%); /* プロジェクト/自然を意識したグリーン系 */
+            color: var(--color-text);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* メインウィンドウ */
+        .window-frame {
+            background-color: var(--color-window-bg);
+            border: 4px solid var(--color-window-border);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 20px;
+        }
+
+        /* タイトル */
+        h1 {
+            font-size: 1.6em;
+            color: var(--color-link); 
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-window-border);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+        /* メッセージボックス */
+        .message-box {
+            background-color: #e6e0d8;
+            border: 2px solid var(--color-window-border);
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 70px;
+        }
+        
+        /* --- キャラクター表示エリア --- */
+        .character-party {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        /* キャラクターボタン */
+        .character-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            background: none;
+            border: none;
+            outline: none;
+            transition: background-color 0.1s;
+        }
+
+        .character-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .character-name {
+            margin-top: 5px;
+            color: var(--color-text);
+            font-weight: bold;
+        }
+
+        /* キャラクター画像 (CSSスプライト風) */
+        .character-sprite {
+            width: 40px; 
+            height: 40px; 
+            border: 2px solid var(--color-window-border);
+            box-shadow: 0 0 0 1px #fff inset; 
+            transition: transform 0.1s; 
+        }
+
+        /* 各ジョブ固有の色 (エンジニアリングテーマに合わせた配色) */
+        .job-architect { background-color: #008080; } /* アーキテクト: 構造/計画 (青緑) */
+        .job-researcher { background-color: #ffaa00; border: 2px solid #a06a00; } /* リサーチャー: 調査/学習 (オレンジ) */
+        .job-specialist { background-color: #3333cc; } /* スペシャリスト: 実装/実行 (濃い青) */
+        
+        /* 動きが加わったときのアニメーション */
+        .character-sprite.active {
+            animation: jump-and-move 0.4s ease-out;
+        }
+
+        @keyframes jump-and-move {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+            100% { transform: translateY(0); }
+        }
+
+        /* --- 情報ウィンドウ（アコーディオン） --- */
+        .info-window {
+            background-color: #e6e0d8;
+            border: 2px solid var(--color-window-border);
+            padding: 15px;
+            min-height: 100px;
+            display: none; 
+        }
+
+        .info-window.active {
+            display: block;
+        }
+
+        .data-label {
+            color: var(--color-link);
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .cursor {
+            color: var(--color-window-border);
+            display: inline-block;
+            animation: blink 0.7s infinite steps(1);
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="window-frame">
+        <h1>BABYLON::プロジェクト・ボード</h1>
+
+        <div class="character-party">
+            
+            <button class="character-button" data-job="architect" data-info="アーキテクチャ設計をかいし！" data-target="info-architect">
+                <div class="character-sprite job-architect" id="sprite-architect"></div>
+                <span class="character-name">アーキテクト</span>
+            </button>
+            
+            <button class="character-button" data-job="researcher" data-info="最新ドキュメントを参照！" data-target="info-researcher">
+                <div class="character-sprite job-researcher" id="sprite-researcher"></div>
+                <span class="character-name">リサーチャー</span>
+            </button>
+
+            <button class="character-button" data-job="specialist" data-info="コード最適化を実行します！" data-target="info-specialist">
+                <div class="character-sprite job-specialist" id="sprite-specialist"></div>
+                <span class="character-name">スペシャリスト</span>
+            </button>
+            
+        </div>
+
+        <div class="message-box">
+            <p id="message-text">タスクをえらんでください。<span class="cursor">▶</span></p>
+        </div>
+
+        <div id="info-window-container">
+            
+            <div class="info-window" id="info-architect">
+                <p>「**アーキテクチャ**」の持続性について分析します。</p>
+                <p><span class="data-label">継続性スキル</span>：ランニング (ENDURANCE)</p>
+                <p>コメント：長期運用に耐えうる**堅牢な設計**を提供します。</p>
+            </div>
+
+            <div class="info-window" id="info-researcher">
+                <p>「**環境最適化**」の調査結果を報告します。</p>
+                <p><span class="data-label">調査テーマ</span>：自然の中で生活 (DISTRIBUTED ENVIRONMENT)</p>
+                <p>コメント：**分散型**で、どこでも機能するソリューションが理想です。</p>
+            </div>
+
+            <div class="info-window" id="info-specialist">
+                <p>「**ワークフロー**」の効率化目標です。</p>
+                <p><span class="data-label">目標ステータス</span>：家で仕事 (REMOTE EFFICIENCY)</p>
+                <p>コメント：**リモート**でも最高のパフォーマンスを発揮するシステム構築を目指します。</p>
+            </div>
+            
+        </div>
+        
+    </main>
+
+    <script>
+        /*
+         * --- JavaScript スクリプト定義 ---
+         * キャラクタークリックと情報表示を連動
+         */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const charButtons = document.querySelectorAll('.character-button');
+            const messageText = document.getElementById('message-text');
+
+            // 全てのキャラクターボタンにイベントリスナーを設定
+            charButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const infoId = button.getAttribute('data-target');
+                    const spriteId = `sprite-${button.getAttribute('data-job')}`;
+                    const infoMessage = button.getAttribute('data-info');
+
+                    // 1. 全ての情報ウィンドウを閉じる
+                    closeAllInfoWindows();
+
+                    // 2. 全てのキャラのactiveクラスを解除
+                    document.querySelectorAll('.character-sprite').forEach(sprite => {
+                        sprite.classList.remove('active');
+                    });
+
+                    // 3. クリックされたキャラを動かす
+                    const clickedSprite = document.getElementById(spriteId);
+                    animateCharacter(clickedSprite);
+
+                    // 4. 情報ウィンドウを表示する
+                    document.getElementById(infoId).classList.add('active');
+
+                    // 5. メッセージボックスにメッセージを表示する
+                    messageText.textContent = `▶ ${infoMessage}`;
+                });
+            });
+
+            // 全ての情報ウィンドウを閉じる関数
+            function closeAllInfoWindows() {
+                document.querySelectorAll('.info-window').forEach(win => {
+                    win.classList.remove('active');
+                });
+            }
+
+            // キャラクターアニメーションを実行する関数
+            function animateCharacter(spriteElement) {
+                spriteElement.classList.add('active');
+                setTimeout(() => {
+                    spriteElement.classList.remove('active');
+                }, 400); 
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+ <!-- koehamemoduasu 
+<h1>見出しが表示されるか確認</h1>
+<p>文章が表示されるか確認</p>
+<section>
+    <h1>見出し１</h1>
+    <a href="https://techis.jp/">テックアイエスのHPへ</a>
+</section>
+  <p class="test1">クラスとidの違いについて</p>
+  <p id="test2">クラスとidの違いについて</p>
+<style>
+    table, th, td {
+     border: 1px solid black;
+     border-collapse: collapse; /* 二重線を防ぐ */
+    }
+    th, td {
+     padding: 8px; /* 余白をつけると見やすい */
+    }
+</style>
+<p>
+  <span style="color: blue; font-size: 20px; font-weight: bold; font-family: 'Arial';">
+    青くて太字で大きい文字
+  </span>
+</p>
+
+-->

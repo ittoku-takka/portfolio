@@ -1,0 +1,16 @@
+
+p {
+    font-size: 30px;
+}
+
+#rightmessage {
+    text-align: right;
+}
+
+#centermessage {
+    text-align: center;
+}
+
+#leftmessage {
+    text-align: left;
+}
